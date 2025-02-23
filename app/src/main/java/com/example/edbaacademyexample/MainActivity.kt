@@ -66,7 +66,6 @@ fun Greeting(
     message: String? = null,
 ) {
 
-    println("===is ${message is String}")
     Column {
         Text(
             text = "Greetings $name!",
