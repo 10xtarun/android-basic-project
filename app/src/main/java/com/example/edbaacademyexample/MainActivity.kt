@@ -79,25 +79,6 @@ fun Greeting(
             modifier = modifier
         )
 
-        val a = A()
-        a.message(value = finalMessage)
-
-        val b = B()
-        b.message(finalMessage, "Bruce Wayne")
-
-//        fun intoX(value: Int, x: Int) = value * x
-//        println("Multiply, intoX: ${intoX(2, 5)}")
-
-        val op = toMyList(value = finalMessage)
-        println("===op $op")
-
-        val finalNumber = 123456
-        val op1 = toMyList(value = finalNumber)
-        println("===op1 $op1")
-
-        val xyz = "String"
-        xyz.toAnyList(xyz)
-
     }
 }
 
@@ -109,6 +90,7 @@ fun GreetingPreview() {
     }
 }
 
+/**
 open class A() {
     fun message(value: String) {
         println("Hello: $value ")
@@ -128,3 +110,4 @@ fun <T> toMyList(value: T): List<T> {
 }
 
 fun <T> Any.toAnyList(value: T): List<T> = toMyList(value)
+        **/
