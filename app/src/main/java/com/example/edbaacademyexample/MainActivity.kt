@@ -16,15 +16,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,27 +42,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.edbaacademyexample.models.Posts
 import com.example.edbaacademyexample.ui.theme.EdbaAcademyExampleTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val networkManager = NetworkManager()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         setContent {
             EdbaAcademyExampleTheme {
+                var posts : MutableState<List<Posts>> = remember {
+                    mutableStateOf(emptyList())
+                }
 
-                var todoItem = remember {
-                    mutableStateOf("")
-                }
-                var todos = remember {
-                    mutableStateOf(emptyList<String>())
-                }
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                    Column(
                        modifier = Modifier
@@ -70,7 +79,7 @@ class MainActivity : ComponentActivity() {
 
                        Row {
                            Text(
-                               text = "Your Todo List!",
+                               text = "Your Posts List",
                                fontSize = 36.sp,
                                fontWeight = FontWeight.Bold,
                                modifier = Modifier
@@ -82,32 +91,22 @@ class MainActivity : ComponentActivity() {
                            horizontalArrangement = Arrangement.Center,
                            verticalAlignment = Alignment.CenterVertically
                        ) {
-                           OutlinedTextField(
-                               value = todoItem.value,
-                               onValueChange = { text ->
-                                   todoItem.value = text
-                                   println("=== ${todoItem.value}")
-                               },
-                               modifier = Modifier
-                                   .padding(12.dp)
-                           )
-
                            Button(
                                onClick = {
-                                   if(todoItem.value.isNotBlank()){
-                                       todos.value += todoItem.value
+                                   CoroutineScope(Dispatchers.IO).launch {
+                                       val response = networkManager.fetchPosts()
+                                       posts.value = response
                                    }
-                                   todoItem.value = ""
-
-                                   println("=== ${todos.value}")
+                                   println("=== clicked!")
                                },
                                shape = RoundedCornerShape(5f),
                                modifier = Modifier
                                    .height(intrinsicSize = IntrinsicSize.Max)
+                                   .fillMaxWidth()
                            ) {
                                Text(
-                                   text = "Add",
-                                   fontSize = 16.sp,
+                                   text = "Fetch Posts",
+                                   fontSize = 20.sp,
                                    modifier = Modifier
                                )
                            }
@@ -116,16 +115,59 @@ class MainActivity : ComponentActivity() {
                        Row  (
                            verticalAlignment = Alignment.CenterVertically
                        )  {
-                           LazyColumn  {
-                               items(todos.value){ item ->
-                                   Text(
-                                       text = item,
-                                       fontSize = 24.sp,
-                                       fontWeight = FontWeight.Medium,
-                                       modifier = Modifier
-                                           .padding(12.dp)
-                                   )
-                                   HorizontalDivider()
+                           LazyColumn {
+
+                               items(posts.value){ postItem ->
+
+                                       Card(
+                                           colors = CardDefaults.cardColors(
+                                               containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                           ),
+                                           modifier = Modifier
+                                               .fillMaxWidth()
+                                               .height(120.dp)
+                                               .padding(10.dp)
+                                       ) {
+                                           Column(
+                                               modifier = Modifier.fillMaxWidth()
+                                           ) {
+                                               Row (
+                                                   modifier = Modifier.fillMaxWidth()
+                                               ) {
+                                                   Text(
+                                                       text = "By User: ${postItem.userId}",
+                                                       modifier = Modifier
+                                                           .width(intrinsicSize = IntrinsicSize.Max)
+                                                           .padding(8.dp)
+                                                       ,
+                                                       textAlign = TextAlign.Left,
+
+                                                   )
+
+                                                   Text(
+                                                       text = "Post Id: ${postItem.id}",
+                                                       modifier = Modifier
+                                                           .width(intrinsicSize = IntrinsicSize.Max)
+                                                           .padding(8.dp)
+                                                       ,
+                                                       textAlign = TextAlign.Right,
+                                                   )
+                                               }
+
+                                               Row {
+                                                   Text(
+                                                       text = postItem.title.toString(),
+                                                       modifier = Modifier
+                                                           .padding(8.dp)
+                                                       ,
+                                                       fontWeight = FontWeight.Bold,
+                                                       textAlign = TextAlign.Center,
+
+                                                   )
+                                               }
+
+                                           }
+                                       }
                                }
                            }
                        }
