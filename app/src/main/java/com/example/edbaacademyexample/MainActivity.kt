@@ -118,54 +118,101 @@ class MainActivity : ComponentActivity() {
                            LazyColumn {
 
                                items(posts.value){ postItem ->
-
                                        Card(
                                            colors = CardDefaults.cardColors(
                                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                            ),
                                            modifier = Modifier
                                                .fillMaxWidth()
-                                               .height(120.dp)
+                                               .height(150.dp)
                                                .padding(10.dp)
                                        ) {
-                                           Column(
-                                               modifier = Modifier.fillMaxWidth()
+                                           Row(
+                                               modifier = Modifier
+                                                   .fillMaxWidth()
                                            ) {
-                                               Row (
-                                                   modifier = Modifier.fillMaxWidth()
+                                               Column(
+                                                   modifier = Modifier.width(IntrinsicSize.Max)
                                                ) {
-                                                   Text(
-                                                       text = "By User: ${postItem.userId}",
-                                                       modifier = Modifier
-                                                           .width(intrinsicSize = IntrinsicSize.Max)
-                                                           .padding(8.dp)
-                                                       ,
-                                                       textAlign = TextAlign.Left,
+                                                   Row(
+                                                       modifier = Modifier.fillMaxWidth()
+                                                   ) {
+                                                       Text(
+                                                           text = "By User: ${postItem.userId}",
+                                                           modifier = Modifier
+                                                               .width(intrinsicSize = IntrinsicSize.Max)
+                                                               .padding(8.dp),
+                                                           textAlign = TextAlign.Left,
 
-                                                   )
+                                                           )
 
-                                                   Text(
-                                                       text = "Post Id: ${postItem.id}",
-                                                       modifier = Modifier
-                                                           .width(intrinsicSize = IntrinsicSize.Max)
-                                                           .padding(8.dp)
-                                                       ,
-                                                       textAlign = TextAlign.Right,
-                                                   )
+                                                       Text(
+                                                           text = "Post Id: ${postItem.id}",
+                                                           modifier = Modifier
+                                                               .width(intrinsicSize = IntrinsicSize.Max)
+                                                               .padding(8.dp),
+                                                           textAlign = TextAlign.Right,
+                                                       )
+                                                   }
+
+                                                   Row {
+                                                       Text(
+                                                           text = postItem.title.toString(),
+                                                           modifier = Modifier
+                                                               .padding(8.dp),
+                                                           fontWeight = FontWeight.Bold,
+                                                           textAlign = TextAlign.Center,
+
+                                                           )
+                                                   }
+
+
                                                }
 
-                                               Row {
-                                                   Text(
-                                                       text = postItem.title.toString(),
+                                               Column(
+                                                   modifier = Modifier.width(IntrinsicSize.Min)
+                                                       .padding(top = 20.dp),
+                                                   verticalArrangement = Arrangement.Center,
+                                                   horizontalAlignment = Alignment.CenterHorizontally
+                                               ) {
+                                                   Button(
+                                                       onClick = {
+                                                           println("=== clicked!")
+
+                                                          val currentPostIndex =  posts.value.indexOfFirst { pt ->
+                                                               pt.id == postItem.id && pt.userId == postItem.userId
+                                                           }
+
+//                                                          var leftSideList: List<Posts> = emptyList()
+//
+//                                                           for (index: Int in posts.value.indices) {
+//                                                               if(index == currentPostIndex) {
+//                                                                   break
+//                                                               }
+//                                                               leftSideList = leftSideList.plusElement(posts.value[index])
+//                                                           }
+//
+//                                                           println("=== leftSideList $leftSideList")
+//
+//                                                           val newArray = leftSideList + posts.value.slice(IntRange(currentPostIndex + 1, posts.value.size -1 ))
+
+                                                           val newArray = posts.value.slice(IntRange(0, currentPostIndex - 1 )) +  posts.value.slice(IntRange(currentPostIndex + 1, posts.value.size -1 ))
+
+                                                           posts.value = newArray
+                                                           println("=== currentPost : $currentPostIndex")
+                                                       },
+                                                       shape = RoundedCornerShape(25),
                                                        modifier = Modifier
-                                                           .padding(8.dp)
-                                                       ,
-                                                       fontWeight = FontWeight.Bold,
-                                                       textAlign = TextAlign.Center,
+                                                           .fillMaxSize(0.9F),
 
-                                                   )
+                                                   ) {
+                                                       Text(
+                                                           "X",
+                                                           fontSize = 50.sp,
+                                                           fontWeight = FontWeight.ExtraBold
+                                                       )
+                                                   }
                                                }
-
                                            }
                                        }
                                }
